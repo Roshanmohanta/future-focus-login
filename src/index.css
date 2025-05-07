@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 250 60% 70%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -96,6 +99,27 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
+}
+
+/* Custom styles for form elements */
+.auth-input {
+  @apply h-12 rounded-lg border border-gray-200 bg-white px-4 text-sm transition-all focus:border-career-lightPurple focus:outline-none focus:ring-2 focus:ring-career-lightPurple/20 w-full;
+}
+
+.auth-label {
+  @apply text-sm font-medium text-gray-700 mb-1.5 block;
+}
+
+.auth-btn {
+  @apply relative h-12 w-full rounded-lg bg-gradient-to-r from-career-purple to-career-lightPurple text-white font-medium flex items-center justify-center transition-all hover:opacity-90 active:scale-[0.98];
+}
+
+.auth-card {
+  @apply bg-white rounded-2xl shadow-lg p-8 w-full max-w-md transition-all;
+}
+
+.form-error {
+  @apply text-destructive text-xs mt-1;
 }
