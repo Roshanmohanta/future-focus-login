@@ -1,21 +1,6 @@
 
 import { toast } from "sonner";
-
-export interface UserRegistration {
-  name: string;
-  email: string;
-  username: string;
-  password: string;
-  phone: string;
-  address: string;
-  age: number;
-  dateOfBirth: string;
-}
-
-export interface UserLogin {
-  username: string;
-  password: string;
-}
+import { UserFormData, LoginFormData } from "@/types/auth";
 
 export interface User {
   id: number;
@@ -30,80 +15,87 @@ export interface User {
 }
 
 class AuthService {
-  private baseUrl = "/api/auth"; // This would be your API endpoint
+  private baseUrl = "http://localhost:5000/api/auth"; 
   private isLoggedInValue = false;
   private currentUser: User | null = null;
+  private token: string | null = null;
 
-  // For development simulating backend
-  async simulateApiCall<T>(data: any, success: boolean = true, delay: number = 800): Promise<T> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (success) {
-          resolve(data as T);
-        } else {
-          reject(new Error("API call failed"));
-        }
-      }, delay);
-    });
-  }
-
-  async register(userData: UserRegistration): Promise<boolean> {
+  async register(userData: UserFormData): Promise<boolean> {
     try {
-      // In actual implementation, this would be a fetch call to your backend API
-      // const response = await fetch(`${this.baseUrl}/register`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(userData)
-      // });
+      const response = await fetch(`${this.baseUrl}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData)
+      });
       
-      // For demo purposes, simulating API call
-      const response = await this.simulateApiCall<{success: boolean, message: string}>(
-        { success: true, message: "Registration successful" },
-        true
-      );
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
       
       toast.success("Registration successful! Please log in.");
       return true;
     } catch (error) {
       console.error("Registration error:", error);
-      toast.error("Registration failed. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Registration failed. Please try again.");
       return false;
     }
   }
 
-  async login(credentials: UserLogin): Promise<User | null> {
+  async login(credentials: LoginFormData): Promise<User | null> {
     try {
-      // In actual implementation, this would be a fetch call to your backend API
-      // const response = await fetch(`${this.baseUrl}/login`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(credentials)
-      // });
+      const response = await fetch(`${this.baseUrl}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials)
+      });
       
-      // For demo purposes, simulating API call
-      const mockUser: User = {
-        id: 1,
-        username: credentials.username,
-        email: `${credentials.username}@example.com`,
-        name: "Demo User",
-        role: "user"
-      };
+      const data = await response.json();
       
-      const response = await this.simulateApiCall<{user: User}>(
-        { user: mockUser },
-        true
-      );
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
       
       this.isLoggedInValue = true;
-      this.currentUser = response.user;
+      this.currentUser = data.user;
+      this.token = data.token;
       
-      localStorage.setItem("user", JSON.stringify(response.user));
-      toast.success(`Welcome back, ${response.user.name || response.user.username}!`);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token);
       
-      return response.user;
+      toast.success(`Welcome back, ${data.user.name || data.user.username}!`);
+      
+      return data.user;
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Login failed. Please check your credentials.");
+      toast.error(error instanceof Error ? error.message : "Login failed. Please check your credentials.");
+      return null;
+    }
+  }
+
+  async getCurrentUser(): Promise<User | null> {
+    if (!this.token) {
+      return null;
+    }
+    
+    try {
+      const response = await fetch(`${this.baseUrl}/me`, {
+        headers: { 
+          "Authorization": `Bearer ${this.token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch user profile");
+      }
+      
+      const data = await response.json();
+      this.currentUser = data.user;
+      return data.user;
+    } catch (error) {
+      console.error("Get current user error:", error);
       return null;
     }
   }
@@ -111,7 +103,9 @@ class AuthService {
   logout(): void {
     this.isLoggedInValue = false;
     this.currentUser = null;
+    this.token = null;
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     toast.info("You have been logged out");
   }
 
@@ -119,16 +113,19 @@ class AuthService {
     return this.isLoggedInValue;
   }
 
-  getCurrentUser(): User | null {
+  getUser(): User | null {
     return this.currentUser;
   }
 
   // Method to check if user is logged in from localStorage on page refresh
   initializeFromStorage(): void {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    const storedToken = localStorage.getItem("token");
+    
+    if (storedUser && storedToken) {
       try {
         this.currentUser = JSON.parse(storedUser);
+        this.token = storedToken;
         this.isLoggedInValue = true;
       } catch (e) {
         console.error("Error parsing stored user", e);

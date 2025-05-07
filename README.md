@@ -1,73 +1,50 @@
-# Welcome to your Lovable project
 
-## Project info
+# Career Recommendation Portal
 
-**URL**: https://lovable.dev/projects/d696d295-af0c-4f49-ae1e-6be5d487392d
+## Backend Setup Instructions
 
-## How can I edit this code?
+### Prerequisites
+- Node.js installed on your computer
+- MySQL installed and running on your computer
+- Database credentials (username, password) as specified in the .env file
 
-There are several ways of editing your application.
+### Setup Steps
 
-**Use Lovable**
+1. **Install Backend Dependencies**
+   ```bash
+   npm install --prefix backend
+   ```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d696d295-af0c-4f49-ae1e-6be5d487392d) and start prompting.
+2. **Setup Database**
+   ```bash
+   npm run setup-db --prefix backend
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+3. **Start the Backend Server**
+   ```bash
+   npm start --prefix backend
+   ```
+   
+   or for development with auto-reload:
+   ```bash
+   npm run dev --prefix backend
+   ```
 
-**Use your preferred IDE**
+4. **Verify the Server is Running**
+   Open your browser and go to: http://localhost:5000/api/health
+   
+   You should see a response like:
+   ```json
+   {
+     "status": "ok",
+     "message": "Server is running"
+   }
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Frontend Development
+The frontend React application will automatically connect to the backend when running locally.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/d696d295-af0c-4f49-ae1e-6be5d487392d) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## Important Notes
+- The backend runs on port 5000 by default
+- Make sure your MySQL service is running before starting the server
+- Check the .env file for configuration settings if needed
