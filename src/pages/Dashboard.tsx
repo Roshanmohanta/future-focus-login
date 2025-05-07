@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { LucideArrowLeft, LucideLogOut } from "lucide-react";
-import authService from "@/services/AuthService";
+import authService, { User as ServiceUser } from "@/services/AuthService";
 import { User } from "@/types/auth";
 import { toast } from "@/hooks/use-toast";
 
@@ -20,7 +20,22 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const userData = await authService.getCurrentUser();
-        setUser(userData);
+        
+        // Convert ServiceUser to User type if needed
+        if (userData) {
+          const convertedUser: User = {
+            id: userData.id,
+            name: userData.name || "",  // Convert optional to required
+            email: userData.email,
+            username: userData.username,
+            phone: userData.phone,
+            address: userData.address,
+            age: userData.age,
+            date_of_birth: userData.dateOfBirth,
+            role: userData.role
+          };
+          setUser(convertedUser);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
         toast({
